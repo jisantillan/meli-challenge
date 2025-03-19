@@ -2,7 +2,6 @@ package validator
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -21,54 +20,6 @@ func matchesPattern(value, regex string) bool {
 	return matched
 }
 
-func validateDuration(duration string, position int) (bool, int) {
-
-	durationRegex := `^(\d+/\d+|\d+)$` // checks for a fraction (n/n) or a number
-
-	if !matchesPattern(duration, durationRegex) {
-		return false, position
-	}
-
-	if strings.Contains(duration, "/") {
-		if !ValidateFractionalBetween(duration, "/", 0, 4) {
-			return false, position
-		}
-	} else {
-		if !ValidateIntegerBetween(duration, 0, 4) {
-			return false, position
-		}
-	}
-
-	return true, -1
-}
-
-func validateAlteration(value string, note string, position int) (bool, int) {
-	if note == "E" || note == "B" {
-		if value != "n" {
-			return false, position
-		}
-	}
-
-	if value != "#" && value != "b" && value != "n" {
-		return false, position
-	}
-
-	return true, -1
-}
-
-func validateOctave(value string, position int) (bool, int) {
-	octave, err := strconv.Atoi(value)
-	if err != nil {
-		return false, position
-	}
-
-	if octave < 0 || octave > 8 {
-		return false, position
-	}
-
-	return true, -1
-}
-
 func validateCloseFormat(part string, position int) (bool, int) {
 	if !strings.HasSuffix(part, "}") {
 		return false, position + len(part)
@@ -77,7 +28,7 @@ func validateCloseFormat(part string, position int) (bool, int) {
 }
 
 func validateAttributeValues(attributesStr string, allowedAttributes map[string]bool, position int, part string) (bool, int) {
-	attributes := strings.Split(attributesStr, ";")
+	attributes := strings.Split(strings.TrimSuffix(attributesStr, ";"), ";")
 	seenAttributes := make(map[string]bool)
 
 	currPos := 2
@@ -87,15 +38,11 @@ func validateAttributeValues(attributesStr string, allowedAttributes map[string]
 			return false, position + currPos
 		}
 
-		if i < len(attributes)-1 && part[currPos+len(attr)] != ';' {
-			return false, position + currPos
-		}
-
-		parts := strings.SplitN(attr, "=", 2)
+		attrStr := splitAttributeValue(attr)
+		parts := strings.SplitN(attrStr, "=", 2)
 		if len(parts) != 2 {
 			return false, position + currPos
 		}
-
 		key, value := parts[0], parts[1]
 
 		if !allowedAttributes[key] {
@@ -109,18 +56,22 @@ func validateAttributeValues(attributesStr string, allowedAttributes map[string]
 
 		switch key {
 		case "d":
-			if valid, errPos := validateDuration(value, position+currPos+len(key)+1); !valid {
-				return false, errPos
+			if valid := ValidateDuration(value); !valid {
+				return false, position + currPos + len(key) + 1
 			}
 		case "o":
-			if valid, errPos := validateOctave(value, position+currPos+len(key)+1); !valid {
-				return false, errPos
+			if valid := ValidateOctave(value); !valid {
+				return false, position + currPos + len(key) + 1
 			}
 		case "a":
 			note := string(part[0])
-			if valid, errPos := validateAlteration(value, note, position+currPos+len(key)+1); !valid {
-				return false, errPos
+			if valid := ValidateAlteration(value, note); !valid {
+				return false, position + currPos + len(key) + 1
 			}
+		}
+
+		if i < len(attributes)-1 && part[currPos+len(attrStr)] != ';' {
+			return false, position + currPos + len(attrStr)
 		}
 
 		// next position (+1 due `;`)
@@ -128,20 +79,25 @@ func validateAttributeValues(attributesStr string, allowedAttributes map[string]
 	}
 
 	if strings.HasSuffix(attributesStr, ";") {
-		return false, position + len(attributesStr)
+		return false, position + len(attributesStr) + 1
 	}
 
 	return true, -1
 }
 
-func extractAttributes(part string) (string, error) {
-	var attributesStr string
-	if strings.HasPrefix(part[1:], "{") && strings.HasSuffix(part, "}") {
-		attributesStr = part[2 : len(part)-1]
-	} else {
-		attributesStr = part[2:]
+func splitAttributeValue(attr string) string {
+	idx := strings.Index(attr, "=")
+	if idx == -1 {
+		return ""
 	}
-	return attributesStr, nil
+
+	value := attr[idx+1:]
+
+	if equalsIdx := strings.Index(value, "="); equalsIdx != -1 {
+		value = value[:equalsIdx-2]
+	}
+
+	return attr[:idx+1] + value
 }
 
 func validateOpenFormat(part string, position int) (bool, int) {
@@ -157,7 +113,7 @@ func validateAttributes(part string, position int, allowedAttributes map[string]
 		return false, errPos
 	}
 
-	attributesStr, err := extractAttributes(part)
+	attributesStr, err := ExtractAttributes(part)
 	if err != nil {
 		return false, -1
 	}
