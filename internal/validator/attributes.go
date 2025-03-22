@@ -33,6 +33,12 @@ func ValidateAlteration(value string, note string) bool {
 		}
 	}
 
+	if note == "C" || note == "F" {
+		if value == "b" {
+			return false
+		}
+	}
+
 	if value != "#" && value != "b" && value != "n" {
 		return false
 	}

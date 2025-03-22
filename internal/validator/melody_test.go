@@ -104,6 +104,19 @@ func TestValidateMelody_InvalidAlteration_BNote(t *testing.T) {
 	}
 }
 
+func TestValidateMelody_InvalidAlteration_CbemolNote(t *testing.T) {
+	melody := "60 A{d=7/4;o=3;a=#} C{a=b;o=2;d=1/2} S A{d=2;a=b} G{a=b} B S{d=1/3}"
+	valid, errPos := ValidateMelody(melody)
+
+	if valid {
+		t.Errorf("Expected melody to be invalid due to invalid alteration to C note 'a=b', but it passed")
+	} else {
+		if errPos != 24 {
+			t.Errorf("Expected error at position 24, but got %d", errPos)
+		}
+	}
+}
+
 func TestValidateMelody_InvalidOctave(t *testing.T) {
 	melody := "60 A{d=7/4;o=3;a=#} B{o=2;d=1/2} S A{d=2;a=n} G{o=99;a=b} B S{d=1/3}"
 	valid, errPos := ValidateMelody(melody)
