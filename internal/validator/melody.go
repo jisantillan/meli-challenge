@@ -174,6 +174,17 @@ func validateTempo(tempo string, position int) (bool, int) {
 	return true, -1
 }
 
+// Validates a melody string and returns if it's valid.
+// If invalid, it returns the error position.
+//
+// Parameters:
+//
+//	melody (string): The melody to validate.
+//
+// Returns:
+//
+//	bool: true if valid, false if invalid.
+//	int: -1 if valid, error position if invalid.
 func ValidateMelody(melody string) (bool, int) {
 	if len(melody) == 0 {
 		return false, 0
