@@ -15,6 +15,6 @@ func main() {
 
 	err := http.ListenAndServe(port, mux)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error starting server: %v", err)
 	}
 }
