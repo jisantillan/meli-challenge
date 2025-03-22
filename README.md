@@ -43,3 +43,105 @@ valid melody
 error at position n
  ```
 
+
+# API
+## Levantar el servidor 
+Para iniciar el servidor de la API, ejecutar el siguiente comando:
+
+```bash
+go run ./cmd/api
+ ```
+
+Al ejecutar el comando anterior, el servidor escuchará en el puerto 8080 y estará disponible para recibir solicitudes HTTP.
+## Referencia
+**`POST` `/melody/validate`**
+### Descripción
+Este endpoint acepta un body JSON con el campo **melody** que contiene la melodía a validar.
+
+### Request
+#### Headers
+
+| Parámetro | Valor |
+| :-------: | :---------- |
+| `Content-Type` | `application/json` |
+
+####  Request Body
+
+| Campo | Tipo           | Descripción |
+| :-------: | :-----------:  | :---------- |
+| `melody`     | `string` | Melodia musical a ser validada |
+
+#### Ejemplo
+``` json
+{
+    "melody": "60 A{d=7/4;o=3;a=#} B{o=2;d=1/4} S G{d=2}"
+}
+```
+### Response
+
+#### Códigos HTTP
+
+| Codigo | Descripción |
+| :----: | :---------- |
+| **200** | OK |
+| **400** | Bad Request |
+
+#### Headers
+
+| Parámetro | Valor |
+| :-------: | :---------- |
+| `Content-Type` | `application/json` |
+
+#### Ejemplo - Response Exitosa
+
+``` json
+{
+    "tempo": {
+        "value": 60,
+        "unit": "bpm"
+    },
+    "notes": [
+        {
+            "type": "note",
+            "name": "la",
+            "octave": 3,
+            "alteration": "#",
+            "duration": 1.75,
+            "frequency": 233.08
+        },
+        {
+            "type": "note",
+            "name": "si",
+            "octave": 2,
+            "alteration": "n",
+            "duration": 0.25,
+            "frequency": 123.47
+        },
+        {
+            "type": "silence",
+            "duration": 1
+        },
+        {
+            "type": "note",
+            "name": "sol",
+            "octave": 4,
+            "alteration": "n",
+            "duration": 2,
+            "frequency": 392.00
+        }
+    ]
+}
+
+ ```
+
+ #### Ejemplo - Response con Error
+
+``` json
+ {
+    "cause": "error at position 18"
+ }
+ ```
+
+
+
+
