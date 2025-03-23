@@ -9,6 +9,7 @@ func NewRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /melody/validate", ValidateMelodyHandler)
+	mux.HandleFunc("POST /melody/play", PlayMelodyHandler)
 
 	return mux
 }
