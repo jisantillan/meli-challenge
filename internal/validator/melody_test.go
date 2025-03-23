@@ -53,11 +53,24 @@ func TestValidateMelody_Invalid_NoSpaceBetweenNotes(t *testing.T) {
 }
 
 func TestValidateMelody_InvalidDuration_FormatError(t *testing.T) {
-	melody := "60 A{d=7/4;o=3;a=#} B{o=2;d=1/2} S A{d=2;a=n} G{a=b} B S{d=0.3}"
+	melody := "60 A{d=7/4;o=3;a=#} B{o=2;d=1/2} S A{d=2;a=n} G{a=b} B S{d=?3}"
 	valid, errPos := ValidateMelody(melody)
 
 	if valid {
-		t.Errorf("Expected melody to be invalid due to invalid duration 'd=0.3', but it passed")
+		t.Errorf("Expected melody to be invalid due to invalid duration 'd=0?3', but it passed")
+	} else {
+		if errPos != 59 {
+			t.Errorf("Expected error at position 59, but got %d", errPos)
+		}
+	}
+}
+
+func TestValidateMelody_InvalidDuration_DecimalOutOfRange(t *testing.T) {
+	melody := "60 A{d=7/4;o=3;a=#} B{o=2;d=1/2} S A{d=2;a=n} G{a=b} B S{d=5.3}"
+	valid, errPos := ValidateMelody(melody)
+
+	if valid {
+		t.Errorf("Expected melody to be invalid due to invalid duration 'd=5.3', but it passed")
 	} else {
 		if errPos != 59 {
 			t.Errorf("Expected error at position 59, but got %d", errPos)
