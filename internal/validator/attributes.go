@@ -7,7 +7,7 @@ import (
 
 func ValidateDuration(duration string) bool {
 
-	durationRegex := `^(\d+/\d+|\d+)$` // checks for a fraction (n/n) or a number
+	durationRegex := `^(\d+/\d+|\d+(\.\d+)?)$` // checks for a fraction (n/n) , integer or decimal number
 
 	if !matchesPattern(duration, durationRegex) {
 		return false
@@ -18,7 +18,7 @@ func ValidateDuration(duration string) bool {
 			return false
 		}
 	} else {
-		if !ValidateIntegerBetween(duration, 0, 4) {
+		if !ValidateDecimalBetween(duration, 0, 4) {
 			return false
 		}
 	}

@@ -29,3 +29,11 @@ func ValidateIntegerBetween(value string, min int, max int) bool {
 	}
 	return num >= min && num <= max
 }
+
+func ValidateDecimalBetween(value string, min float64, max float64) bool {
+	num, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		return false
+	}
+	return num >= min && num <= max
+}
