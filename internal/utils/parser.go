@@ -1,4 +1,4 @@
-package internal
+package utils
 
 import (
 	"fmt"
@@ -107,8 +107,8 @@ func parseSilence(part string) (model.Note, error) {
 func parseNote(part string) (model.Note, error) {
 	if len(part) == 1 {
 		noteName := noteMapping[part]
-		noteNum := numeration(noteName, defaultNoteAttributes.Octave, defaultNoteAttributes.Alteration)
-		frequency := calculateFrequency(noteNum)
+		noteNum := CalculateNumeration(noteName, defaultNoteAttributes.Octave, defaultNoteAttributes.Alteration)
+		frequency := CalculateFrequency(noteNum)
 		frequency = round(frequency, 2)
 		return model.Note{
 			Type:       "note",
@@ -127,8 +127,8 @@ func parseNote(part string) (model.Note, error) {
 	}
 
 	noteName := noteMapping[string(part[0])]
-	noteNum := numeration(noteName, attributes.Octave, attributes.Alteration)
-	frequency := calculateFrequency(noteNum)
+	noteNum := CalculateNumeration(noteName, attributes.Octave, attributes.Alteration)
+	frequency := CalculateFrequency(noteNum)
 	frequency = round(frequency, 2)
 
 	return model.Note{
@@ -196,28 +196,6 @@ func parseDuration(value string) (float64, error) {
 		return -1, fmt.Errorf("invalid duration value")
 	}
 	return -1, fmt.Errorf("invalid duration value")
-}
-
-func numeration(note string, octave int, alteration string) int {
-
-	basePos := notePositions[strings.ToLower(note)]
-
-	var alt int
-	switch alteration {
-	case "b":
-		alt = -1
-	case "#":
-		alt = 1
-	default:
-		alt = 0
-	}
-
-	return basePos + alt + (12 * octave)
-}
-
-func calculateFrequency(noteNum int) float64 {
-	frequency := 440 * math.Pow(2, float64(noteNum-57)/12)
-	return frequency
 }
 
 func round(val float64, precision int) float64 {

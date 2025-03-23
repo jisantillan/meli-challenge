@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"log"
-	"meli-challenge/internal"
 	"meli-challenge/internal/model"
 	"meli-challenge/internal/utils"
 	"meli-challenge/internal/validator"
@@ -38,7 +37,7 @@ func (s *MelodyService) Validate(input string) (*model.Melody, error) {
 	}
 	log.Println("Melody is valid, proceeding to parse")
 
-	melody, err := internal.ParseMelody(input)
+	melody, err := utils.ParseMelody(input)
 
 	if err != nil {
 		log.Printf("Error parsing melody: %v", err)
