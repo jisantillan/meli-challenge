@@ -17,6 +17,10 @@ Para ejecutar este proyecto, es necesario contar con:
    ```bash
    cd meli-challenge
    ```
+3. Instala las dependencias:
+   ```bash
+   go mod tidy
+   ```
 
    
 # Validador de Melodías 
@@ -54,9 +58,10 @@ go run ./cmd/api
 
 Al ejecutar el comando anterior, el servidor escuchará en el puerto 8080 y estará disponible para recibir solicitudes HTTP.
 ## Referencia
+### Validar melodía
 **`POST` `/melody/validate`**
 ### Descripción
-Este endpoint acepta un body JSON con el campo **melody** que contiene la melodía a validar.
+Este endpoint acepta un body JSON con el campo **melody** que contiene la melodía a validar, si es válida retornará una estructura que represente dicha melodía, en caso contrario devolvera una respuesta con la primera posición donde se encuentre un error.
 
 ### Request
 #### Headers
@@ -141,6 +146,89 @@ Este endpoint acepta un body JSON con el campo **melody** que contiene la melod�
     "cause": "error at position 18"
  }
  ```
+
+---
+
+ ### Reproducir melodía
+**`POST` `/melody/play`**
+### Descripción
+Este endpoint acepta un body JSON con una estructura que representa una melodía y la reproduce en el servidor.
+
+### Request
+#### Headers
+
+| Parámetro | Valor |
+| :-------: | :---------- |
+| `Content-Type` | `application/json` |
+
+####  Request Body
+
+| Campo       | Tipo         | Descripción                          |
+|------------|------------|----------------------------------|
+| `tempo`    | `object`   | Contiene la información del tempo de la melodía. |
+| `tempo.value` | `number` | Valor numérico del tempo. |
+| `tempo.unit`  | `string` | Unidad del tempo. |
+| `notes`    | `array`    | Lista de notas musicales en la melodía. |
+| `notes[].type` | `string` | Tipo de elemento (`"note"` o `"silence"`). |
+| `notes[].name` | `string` | Nombre de la nota musical (ej. `"do"`, `"re"`). |
+| `notes[].octave` | `number` | Octava en la que se encuentra la nota. |
+| `notes[].alteration` | `string` | Alteración de la nota (`"none"`, `"#"`, `"b"`). |
+| `notes[].duration` | `number` | Duración de la nota. |
+| `notes[].frequency` | `number` | Frecuencia de la nota. |
+
+
+#### Ejemplo
+``` json
+{
+  "tempo": {
+    "value": 60,
+    "unit": "bpm"
+  },
+  "notes": [
+    {
+      "type": "note",
+      "name": "la",
+      "octave": 3,
+      "alteration": "#",
+      "duration": 1.75,
+      "frequency": 233.08
+    },
+    {
+      "type": "note",
+      "name": "si",
+      "octave": 2,
+      "alteration": "none",
+      "duration": 0.25,
+      "frequency": 123.94
+    },
+    {
+      "type": "silence",
+      "duration": 1
+    },
+    {
+      "type": "note",
+      "name": "sol",
+      "octave": 4,
+      "alteration": "none",
+      "duration": 2,
+      "frequency": 392
+    }
+  ]
+}
+```
+### Response
+
+#### Códigos HTTP
+
+| Codigo | Descripción |
+| :----: | :---------- |
+| **202** | Accepted |
+
+#### Body
+No se espera cuerpo de respuesta.
+
+## Postman Collection
+Puedes descargar la colección de Postman [aquí](https://gist.github.com/jisantillan/01050b3b7b481ebef0ec8759d9ffe580) para probar los endpoints de la API directamente en Postman.
 
 
 
