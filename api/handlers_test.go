@@ -124,3 +124,52 @@ func compareMelodyResponses(current, expected *response.ValidateMelodyResponse) 
 
 	return true
 }
+
+func TestPlayMelodyHandler(t *testing.T) {
+	requestBody := request.PlayMelodyRequest{
+		Tempo: request.Tempo{
+			Value: 60,
+			Unit:  "bpm",
+		},
+		Notes: []request.Note{
+			{
+				Type:       "note",
+				Name:       "la",
+				Octave:     3,
+				Alteration: "#",
+				Duration:   1.75,
+				Frequency:  233.08,
+			},
+			{
+				Type:       "note",
+				Name:       "si",
+				Octave:     2,
+				Alteration: "n",
+				Duration:   0.25,
+				Frequency:  123.47,
+			},
+			{
+				Type:     "silence",
+				Duration: 1,
+			},
+		},
+	}
+
+	body, err := json.Marshal(requestBody)
+	if err != nil {
+		t.Fatalf("Error marshaling request: %v", err)
+	}
+
+	req := httptest.NewRequest("POST", "/melody/play", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	rr := httptest.NewRecorder()
+	PlayMelodyHandler(rr, req)
+
+	res := rr.Result()
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusAccepted {
+		t.Errorf("Expected status %d, got %d", http.StatusAccepted, res.StatusCode)
+	}
+}

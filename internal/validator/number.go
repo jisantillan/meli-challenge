@@ -22,14 +22,6 @@ func ValidateFractionalBetween(value string, delimiter string, min float64, max 
 	return result >= min && result <= max
 }
 
-func ValidateIntegerBetween(value string, min int, max int) bool {
-	num, err := strconv.Atoi(value)
-	if err != nil {
-		return false
-	}
-	return num >= min && num <= max
-}
-
 func ValidateDecimalBetween(value string, min float64, max float64) bool {
 	num, err := strconv.ParseFloat(value, 64)
 	if err != nil {

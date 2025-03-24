@@ -3,10 +3,9 @@ package service
 import (
 	"errors"
 	"log"
-	"meli-challenge/internal"
 	"meli-challenge/internal/model"
+	"meli-challenge/internal/utils"
 	"meli-challenge/internal/validator"
-
 	"strconv"
 )
 
@@ -38,7 +37,7 @@ func (s *MelodyService) Validate(input string) (*model.Melody, error) {
 	}
 	log.Println("Melody is valid, proceeding to parse")
 
-	melody, err := internal.ParseMelody(input)
+	melody, err := utils.ParseMelody(input)
 
 	if err != nil {
 		log.Printf("Error parsing melody: %v", err)
@@ -48,4 +47,29 @@ func (s *MelodyService) Validate(input string) (*model.Melody, error) {
 	log.Println("Melody parsed successfully")
 
 	return melody, nil
+}
+
+// Play a melody based on the given tempo and notes.
+//
+// Parameters:
+//
+//	tempo (model.Tempo): The tempo of the melody.
+//	notes ([]model.Note): The notes of the melody.
+//
+// Returns:
+//
+//	error: An error if the melody cannot be played or an issue occurs during playback.
+func (s *MelodyService) Play(tempo model.Tempo, notes []model.Note) error {
+
+	log.Printf("Received tempo: %v bpm, unit: %s", tempo.Value, tempo.Unit)
+	log.Printf("Received notes: %+v", notes)
+
+	err := utils.PlayMelody(tempo, notes)
+	if err != nil {
+		log.Printf("Error playing melody: %v", err)
+		return err
+	}
+
+	log.Println("Melody playback completed successfully.")
+	return nil
 }
