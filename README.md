@@ -211,7 +211,7 @@ Este endpoint acepta un body JSON con una estructura que representa una melodía
       "octave": 4,
       "alteration": "none",
       "duration": 2,
-      "frequency": 392
+      "frequency": 392.00
     }
   ]
 }
