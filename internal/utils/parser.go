@@ -8,38 +8,6 @@ import (
 	"strings"
 )
 
-var noteMapping = map[string]string{
-	"A": "la",
-	"B": "si",
-	"C": "do",
-	"D": "re",
-	"E": "mi",
-	"F": "fa",
-	"G": "sol",
-}
-
-var notePositions = map[string]int{
-	"do":  0,
-	"re":  2,
-	"mi":  4,
-	"fa":  5,
-	"sol": 7,
-	"la":  9,
-	"si":  11,
-}
-
-type NoteAttributes struct {
-	Duration   float64
-	Octave     int
-	Alteration string
-}
-
-var defaultNoteAttributes = NoteAttributes{
-	Duration:   1,
-	Octave:     4,
-	Alteration: "n",
-}
-
 func ParseMelody(input string) (*model.Melody, error) {
 	fields := strings.Fields(input)
 	if len(fields) == 0 {
